@@ -31,6 +31,10 @@ COPY scripts/download-firmware /usr/local/bin/
 # 将自定义的 bashrc 脚本复制到根文件系统的 profile 目录
 COPY scripts/bashrc.sh /etc/profile.d/ds-aliases.sh
 
+# 复制本仓库内预编译的 anland_kde deb 包
+COPY anland-debbuild/ubuntu2604/kwin/*.deb /tmp/anland-debbuild/ubuntu2604/kwin/
+COPY anland-debbuild/ubuntu2604/xwayland/*.deb /tmp/anland-debbuild/ubuntu2604/xwayland/
+
 # 赋予相关脚本可执行权限
 RUN chmod +x /usr/local/bin/download-firmware /etc/profile.d/ds-aliases.sh
 
@@ -72,16 +76,13 @@ RUN apt-get update && \
             apt-get install -y --no-install-recommends language-pack-kde-pt language-pack-pt; \
         fi; \
     fi && \
-    ######################################################################################################
-    ############################################## anland_kde 支持 ################################################
+    ############################################## anland_kde(wayland) 支持 ################################################
     if [ "$ENABLE_anland_kde_ARG" = "true" ] && ([ "$BUILD_KDE" = "min" ] || [ "$BUILD_KDE" = "conc" ]); then \
         echo "--> [开启] 正在安装 anland_kde..." && \
-        apt-get install -y --no-install-recommends git ca-certificates && \
-        git clone --depth=1 https://github.com/Allenwdk/Droidspaces-rootfs-KDE-builder.git /tmp/builder && \
         echo "--> [开启] 正在安装预编译的 kwin deb 包..." && \
-        dpkg -i /tmp/builder/anland-debbuild/ubuntu2604/kwin/*.deb || apt-get install -f -y && \
+        dpkg -i /tmp/anland-debbuild/ubuntu2604/kwin/*.deb || apt-get install -f -y && \
         echo "--> [开启] 正在安装预编译的 xwayland deb 包..." && \
-        dpkg -i /tmp/builder/anland-debbuild/ubuntu2604/xwayland/*.deb || apt-get install -f -y && \
+        dpkg -i /tmp/anland-debbuild/ubuntu2604/xwayland/*.deb || apt-get install -f -y && \
         echo "--> [开启] 正在安装 anland 启动脚本..." && \
         mkdir -p /opt/anland && \
         git clone --depth=1 https://github.com/superturtlee/anland.git /tmp/anland && \
@@ -89,8 +90,10 @@ RUN apt-get update && \
         cp /opt/anland/startup.sh /usr/local/bin/startanland-kde.sh && \
         chmod +x /usr/local/bin/startanland-kde.sh && \
         echo "--> [开启] 清理临时文件..." && \
-        rm -rf /tmp/builder /tmp/anland && \
+        rm -rf /tmp/anland-debbuild /tmp/anland && \
         echo "--> [开启] anland_kde 支持已安装"; \
+    else \
+        rm -rf /tmp/anland-debbuild; \
     fi && \
     ######################################################################################################
     #输入法 fcitx5 (可选)
@@ -163,8 +166,15 @@ RUN sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen && \
 # 添加环境变量
 RUN cat <<'EOF' > /etc/environment
 XCURSOR_SIZE=48
-DISPLAY=:5
 EOF
+# wayland 显示服务器环境变量配置
+Run if [ "$ENABLE_anland_kde_ARG" != "true" ]; then \
+        echo "DISPLAY=:5" >> /etc/environment; \
+    else \
+        echo "WAYLAND_DISPLAY=wayland-0" >> /etc/environment; \
+        echo "DISPLAY=:0" >> /etc/environment; \
+    fi
+
 # 音频选择
 RUN if [ "$PulseAudio" = "socket" ]; then \
         echo "PULSE_SERVER=unix:/tmp/.pulse-socket" >> /etc/environment; \
