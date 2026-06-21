@@ -67,7 +67,7 @@ RUN apt-get update && \
     if [ "$ENABLE_srf_ARG" = "true" ]; then \
         apt-get install -y fcitx5; \
     fi && \
-    if [ "$ENABLE_srf_ARG" = "true" ] && [ "$ENABLE_zh_tz_ARG" = "true" ]; then \
+    if [ "$ENABLE_srf_ARG" = "true" ] && ( [ "$ENABLE_zh_tz_ARG" = "true" ] || [ "$ENABLE_zh_tz_ARG" = "zh" ] ); then \
         apt-get install -y  fcitx5-chinese-addons; \
     fi && \
     ## 开发工具集成 (可选)
@@ -100,7 +100,7 @@ RUN update-alternatives --set iptables /usr/sbin/iptables-legacy && \
     update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 
 RUN sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen && \
-    if [ "$ENABLE_zh_tz_ARG" = "true" ]; then \
+    if [ "$ENABLE_zh_tz_ARG" = "true" ] || [ "$ENABLE_zh_tz_ARG" = "zh" ]; then \
         export DEBIAN_FRONTEND=noninteractive && \
         ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
         echo "Asia/Shanghai" > /etc/timezone && \
@@ -108,6 +108,14 @@ RUN sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen && \
         sed -i '/zh_CN.UTF-8/s/^# //' /etc/locale.gen && \
         locale-gen && \
         update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8; \
+    elif [ "$ENABLE_zh_tz_ARG" = "pt" ]; then \
+        export DEBIAN_FRONTEND=noninteractive && \
+        ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
+        echo "America/Sao_Paulo" > /etc/timezone && \
+        dpkg-reconfigure -f noninteractive tzdata && \
+        sed -i '/pt_BR.UTF-8/s/^# //' /etc/locale.gen && \
+        locale-gen && \
+        update-locale LANG=pt_BR.UTF-8 LC_ALL=pt_BR.UTF-8; \
     else \
         locale-gen && \
         update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8; \

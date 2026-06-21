@@ -59,7 +59,7 @@ RUN sed -i '/^#ParallelDownloads/s/^#//' /etc/pacman.conf && \
     if [ "$ENABLE_srf_ARG" = "true" ]; then \
         pacman -S --noconfirm --needed fcitx5-im; \
     fi && \
-    if [ "$ENABLE_srf_ARG" = "true" ] && [ "$ENABLE_zh_tz_ARG" = "true" ]; then \
+    if [ "$ENABLE_srf_ARG" = "true" ] && ( [ "$ENABLE_zh_tz_ARG" = "true" ] || [ "$ENABLE_zh_tz_ARG" = "zh" ] ); then \
         pacman -S --noconfirm --needed fcitx5-chinese-addons; \
     fi && \
     ## 开发工具集成 (可选)
@@ -86,12 +86,18 @@ RUN sed -i '/^#ParallelDownloads/s/^#//' /etc/pacman.conf && \
 
 # 配置 Locale 与 SSH
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
-    if [ "$ENABLE_zh_tz_ARG" = "true" ]; then \
+    if [ "$ENABLE_zh_tz_ARG" = "true" ] || [ "$ENABLE_zh_tz_ARG" = "zh" ]; then \
         ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
         echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && \
         locale-gen && \
         echo "LANG=zh_CN.UTF-8" > /etc/locale.conf && \
         echo "LC_ALL=zh_CN.UTF-8" >> /etc/locale.conf; \
+    elif [ "$ENABLE_zh_tz_ARG" = "pt" ]; then \
+        ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
+        echo "pt_BR.UTF-8 UTF-8" >> /etc/locale.gen && \
+        locale-gen && \
+        echo "LANG=pt_BR.UTF-8" > /etc/locale.conf && \
+        echo "LC_ALL=pt_BR.UTF-8" >> /etc/locale.conf; \
     else \
         locale-gen && \
         echo "LANG=en_US.UTF-8" > /etc/locale.conf && \

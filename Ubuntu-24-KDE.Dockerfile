@@ -52,22 +52,20 @@ RUN apt-get update && \
         dolphin kate kinfocenter mesa-utils pulseaudio-utils vulkan-tools  dbus-user-session polkit-kde-agent-1; \
     fi && \
     # 精简KDE
-    if [ "$BUILD_KDE" = "conc" ]; then \
-        apt-get install -y --no-install-recommends \
-        dbus-x11 x11-xserver-utils fonts-noto-cjk fonts-noto-color-emoji kde-plasma-desktop kubuntu-settings-desktop kubuntu-wallpapers \
-        pipewire pipewire-pulse wireplumber powerdevil kscreen plasma-pa ark kwin-x11 upower konsole \
-        dolphin kate kinfocenter mesa-utils pulseaudio-utils vulkan-tools dbus-user-session aha clinfo dmidecode libdisplay-info-bin pciutils wayland-utils xserver-xorg \
-        kfind plasma-systemmonitor filelight glmark2 systemsettings kde-config-screenlocker kio-extras xdg-user-dirs dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers \
-        kimageformat-plugins plasma-browser-integration libcanberra-pulse gstreamer1.0-plugins-base gstreamer1.0-plugins-good sound-theme-freedesktop \
-        polkit-kde-agent-1 libpam-systemd libpam-modules libpam-kwallet5 language-pack-kde-zh-hans language-pack-zh-hans qt6-translations-l10n; \
+        polkit-kde-agent-1 libpam-systemd libpam-modules libpam-kwallet5 qt6-translations-l10n && \
+        if [ "$ENABLE_zh_tz_ARG" = "true" ] || [ "$ENABLE_zh_tz_ARG" = "zh" ]; then \
+            apt-get install -y --no-install-recommends language-pack-kde-zh-hans language-pack-zh-hans; \
+        elif [ "$ENABLE_zh_tz_ARG" = "pt" ]; then \
+            apt-get install -y --no-install-recommends language-pack-kde-pt language-pack-pt; \
+        fi; \
     fi && \
     ######################################################################################################
     #输入法 fcitx5 (可选)
     if [ "$ENABLE_srf_ARG" = "true" ]; then \
         apt-get install -y fcitx5; \
     fi && \
-    if [ "$ENABLE_srf_ARG" = "true" ] && [ "$ENABLE_zh_tz_ARG" = "true" ]; then \
-        apt-get install -y  fcitx5-chinese-addons; \
+    if [ "$ENABLE_srf_ARG" = "true" ] && ( [ "$ENABLE_zh_tz_ARG" = "true" ] || [ "$ENABLE_zh_tz_ARG" = "zh" ] ); then \
+        apt-get install -y fcitx5-chinese-addons; \
     fi && \
     ## 开发工具集成 (可选)
     if [ "$ENABLE_kfgj_ARG" = "true" ]; then \
@@ -99,7 +97,7 @@ RUN update-alternatives --set iptables /usr/sbin/iptables-legacy && \
     update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
 
 RUN sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen && \
-    if [ "$ENABLE_zh_tz_ARG" = "true" ]; then \
+    if [ "$ENABLE_zh_tz_ARG" = "true" ] || [ "$ENABLE_zh_tz_ARG" = "zh" ]; then \
         export DEBIAN_FRONTEND=noninteractive && \
         ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
         echo "Asia/Shanghai" > /etc/timezone && \
@@ -107,6 +105,14 @@ RUN sed -i '/en_US.UTF-8/s/^# //' /etc/locale.gen && \
         sed -i '/zh_CN.UTF-8/s/^# //' /etc/locale.gen && \
         locale-gen && \
         update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8; \
+    elif [ "$ENABLE_zh_tz_ARG" = "pt" ]; then \
+        export DEBIAN_FRONTEND=noninteractive && \
+        ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
+        echo "America/Sao_Paulo" > /etc/timezone && \
+        dpkg-reconfigure -f noninteractive tzdata && \
+        sed -i '/pt_BR.UTF-8/s/^# //' /etc/locale.gen && \
+        locale-gen && \
+        update-locale LANG=pt_BR.UTF-8 LC_ALL=pt_BR.UTF-8; \
     else \
         locale-gen && \
         update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8; \

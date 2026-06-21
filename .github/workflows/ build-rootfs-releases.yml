@@ -50,10 +50,14 @@ on:
           - 'tcp'
           - 'none'
       enable_zh_tz:
-        description: '使用 中文 语言，并更改时区'
+        description: '系统默认语言/区域和时区 (zh = 中文/上海, pt = 葡萄牙语/圣保罗, en = 英语/UTC)'
         required: true
-        type: boolean
-        default: true
+        type: choice
+        default: 'zh'
+        options:
+          - 'zh'
+          - 'pt'
+          - 'en'
       enable_mesa:
         description: '开启 高通骁龙GPU 支持'
         required: true
@@ -232,7 +236,7 @@ jobs:
             - **KDE 开机自启动**: ${{ github.event.inputs.build_KDE_plus }}
             - **Wayland 支持**: ${{ github.event.inputs.enable_anland_kde }}
             - PulseAudio 音频转发: ${{ github.event.inputs.PulseAudio }}
-            - 使用中文作为主语言: ${{ github.event.inputs.enable_zh_tz }}
+            - 系统主语言/时区: ${{ github.event.inputs.enable_zh_tz }}
             - 高通骁龙 GPU 支持: ${{ github.event.inputs.enable_mesa }}
             - 集成 TMOE : ${{ github.event.inputs.enable_tmoe }}
             - 输入法 fcitx5 支持: ${{ github.event.inputs.enable_srf }}

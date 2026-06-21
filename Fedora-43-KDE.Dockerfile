@@ -28,8 +28,9 @@ RUN dnf install -y --setopt=install_weak_deps=False \
     openssh-server net-tools iptables iptables-legacy iputils iproute bind-utils \
     # 用于系统监控的 procps 进程工具
     procps-ng \
-    # 核心内核模块支持及语言包
-    kmod tzdata glibc-locale-source glibc-langpack-en glibc-langpack-zh && \
+    kmod tzdata glibc-locale-source glibc-langpack-en && \
+    if [ "$ENABLE_zh_tz_ARG" = "true" ] || [ "$ENABLE_zh_tz_ARG" = "zh" ]; then dnf install -y --setopt=install_weak_deps=False glibc-langpack-zh; fi && \
+    if [ "$ENABLE_zh_tz_ARG" = "pt" ]; then dnf install -y --setopt=install_weak_deps=False glibc-langpack-pt; fi && \
     ############################################## KDE支持 ################################################
     # 最小化KDE
     echo "%_install_langs all" > /etc/rpm/macros.image-language-conf && \
@@ -51,7 +52,7 @@ RUN dnf install -y --setopt=install_weak_deps=False \
     if [ "$ENABLE_srf_ARG" = "true" ]; then \
         dnf install -y  fcitx5 fcitx5-qt fcitx5-gtk ; \
     fi && \
-    if [ "$ENABLE_srf_ARG" = "true" ] && [ "$ENABLE_zh_tz_ARG" = "true" ]; then \
+    if [ "$ENABLE_srf_ARG" = "true" ] && ( [ "$ENABLE_zh_tz_ARG" = "true" ] || [ "$ENABLE_zh_tz_ARG" = "zh" ] ); then \
         dnf install -y --setopt=install_weak_deps=False fcitx5-chinese-addons; \
     fi && \
     ## 开发工具集成 (可选)
@@ -86,11 +87,16 @@ RUN ln -sf /usr/sbin/iptables-legacy /usr/sbin/iptables && \
     ln -sf /usr/sbin/ip6tables-legacy-save /usr/sbin/ip6tables-save && \
     ln -sf /usr/sbin/ip6tables-legacy-restore /usr/sbin/ip6tables-restore
 
-RUN if [ "$ENABLE_zh_tz_ARG" = "true" ]; then \
+RUN if [ "$ENABLE_zh_tz_ARG" = "true" ] || [ "$ENABLE_zh_tz_ARG" = "zh" ]; then \
         ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
         echo "Asia/Shanghai" > /etc/timezone && \
         echo "LANG=zh_CN.UTF-8" > /etc/locale.conf && \
         echo "LC_ALL=zh_CN.UTF-8" >> /etc/locale.conf; \
+    elif [ "$ENABLE_zh_tz_ARG" = "pt" ]; then \
+        ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
+        echo "America/Sao_Paulo" > /etc/timezone && \
+        echo "LANG=pt_BR.UTF-8" > /etc/locale.conf && \
+        echo "LC_ALL=pt_BR.UTF-8" >> /etc/locale.conf; \
     else \
         echo "LANG=en_US.UTF-8" > /etc/locale.conf && \
         echo "LC_ALL=en_US.UTF-8" >> /etc/locale.conf; \
