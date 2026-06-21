@@ -7,7 +7,7 @@ on:
         description: 'Select the distribution to build'
         required: true
         type: choice
-        default: 'Debian-13-KDE'
+        default: 'Ubuntu-26-KDE'
         options:
           - 'Debian-13-KDE'
           - 'Ubuntu-24-KDE'
