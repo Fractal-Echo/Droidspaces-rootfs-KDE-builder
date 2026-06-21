@@ -59,6 +59,7 @@ RUN apt-get update && \
         dbus-x11 x11-xserver-utils fonts-noto-cjk fonts-noto-color-emoji kde-plasma-desktop kubuntu-settings-desktop kubuntu-wallpapers \
         pipewire pipewire-pulse wireplumber powerdevil kscreen plasma-pa ark kwin-x11 upower konsole \
         dolphin kate kinfocenter mesa-utils pulseaudio-utils vulkan-tools dbus-user-session \
+        xdg-desktop-portal xdg-desktop-portal-kde xdg-desktop-portal-gtk libegl1 libgbm1 libgl1 libgl1-mesa-dri \
         polkit-kde-agent-1 libpam-systemd libpam-modules plasma-session-x11; \
     fi && \
     # 精简KDE
@@ -69,7 +70,8 @@ RUN apt-get update && \
         dolphin kate kinfocenter mesa-utils pulseaudio-utils vulkan-tools dbus-user-session aha clinfo dmidecode libdisplay-info-bin pciutils wayland-utils xserver-xorg \
         kfind plasma-systemmonitor filelight glmark2 vkmark systemsettings kde-config-screenlocker kio-extras xdg-user-dirs dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers \
         kimageformat6-plugins plasma-browser-integration libcanberra-pulse gstreamer1.0-plugins-base gstreamer1.0-plugins-good sound-theme-freedesktop \
-        polkit-kde-agent-1 libpam-systemd libpam-modules libpam-kwallet5 plasma-session-x11 qt6-translations-l10n && \
+        polkit-kde-agent-1 libpam-systemd libpam-modules libpam-kwallet5 plasma-session-x11 qt6-translations-l10n \
+        xdg-desktop-portal xdg-desktop-portal-kde xdg-desktop-portal-gtk libegl1 libgbm1 libgl1 libgl1-mesa-dri && \
         if [ "$ENABLE_zh_tz_ARG" = "true" ] || [ "$ENABLE_zh_tz_ARG" = "zh" ]; then \
             apt-get install -y --no-install-recommends language-pack-kde-zh-hans language-pack-zh-hans; \
         elif [ "$ENABLE_zh_tz_ARG" = "pt" ]; then \
@@ -86,7 +88,7 @@ RUN apt-get update && \
         echo "--> [开启] 正在安装 anland 启动脚本..." && \
         mkdir -p /opt/anland && \
         git clone --depth=1 https://github.com/superturtlee/anland.git /tmp/anland && \
-        cp /tmp/anland/producers/kde/ubuntu2604/startup.sh /opt/anland/ && \
+        cp /tmp/anland/producers/kde/ubuntu2604_v2/startup.sh /opt/anland/ && \
         cp /opt/anland/startup.sh /usr/local/bin/startanland-kde.sh && \
         chmod +x /usr/local/bin/startanland-kde.sh && \
         echo "--> [开启] 清理临时文件..." && \
