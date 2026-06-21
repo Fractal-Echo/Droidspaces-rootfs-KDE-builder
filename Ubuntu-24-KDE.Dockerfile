@@ -52,6 +52,13 @@ RUN apt-get update && \
         dolphin kate kinfocenter mesa-utils pulseaudio-utils vulkan-tools  dbus-user-session polkit-kde-agent-1; \
     fi && \
     # 精简KDE
+    if [ "$BUILD_KDE" = "conc" ]; then \
+        apt-get install -y --no-install-recommends \
+        dbus-x11 x11-xserver-utils fonts-noto-cjk fonts-noto-color-emoji kde-plasma-desktop kubuntu-settings-desktop kubuntu-wallpapers \
+        pipewire pipewire-pulse wireplumber powerdevil kscreen plasma-pa ark kwin-x11 upower konsole \
+        dolphin kate kinfocenter mesa-utils pulseaudio-utils vulkan-tools dbus-user-session aha clinfo dmidecode libdisplay-info-bin pciutils wayland-utils xserver-xorg \
+        kfind plasma-systemmonitor filelight glmark2 vkmark systemsettings kde-config-screenlocker kio-extras xdg-user-dirs dolphin-plugins ffmpegthumbs kdegraphics-thumbnailers \
+        kimageformat6-plugins plasma-browser-integration libcanberra-pulse gstreamer1.0-plugins-base gstreamer1.0-plugins-good sound-theme-freedesktop \
         polkit-kde-agent-1 libpam-systemd libpam-modules libpam-kwallet5 qt6-translations-l10n && \
         if [ "$ENABLE_zh_tz_ARG" = "true" ] || [ "$ENABLE_zh_tz_ARG" = "zh" ]; then \
             apt-get install -y --no-install-recommends language-pack-kde-zh-hans language-pack-zh-hans; \
