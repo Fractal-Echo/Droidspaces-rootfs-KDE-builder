@@ -1,9 +1,6 @@
 name: Build and Release Droidspaces RootFS
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       build_target:
@@ -119,7 +116,7 @@ jobs:
       - name: Parse user build choices
         id: find-templates
         run: |
-          TARGET="${{ github.event.inputs.build_target || 'Debian-13-KDE' }}"
+          TARGET="${{ github.event.inputs.build_target }}"
           
           if [ "$TARGET" = "all" ]; then
             TEMPLATES=$(ls *.Dockerfile | sed 's/\.Dockerfile//' | jq -R -s -c 'split("\n")[:-1]')
@@ -156,7 +153,7 @@ jobs:
 
       - name: Verify build options
         run: |
-          if [ "${{ inputs.build_KDE || 'min' }}" = "none" ] && [ "${{ inputs.build_KDE_plus || 'false' }}" = "true" ]; then
+          if [ "${{ inputs.build_KDE }}" = "none" ] && [ "${{ inputs.build_KDE_plus }}" = "true" ]; then
             echo "❌ Error: Cannot enable KDE auto-start when KDE desktop choice is 'none'"
             echo "Please re-run the workflow, uncheck 'KDE desktop auto-start on boot' or select a KDE desktop"
             exit 1
@@ -168,20 +165,20 @@ jobs:
           ./build_rootfs-native.sh \
             -i "${{ matrix.template }}.Dockerfile" \
             -v "${{ needs.setup.outputs.build_id }}" \
-            -K "${{ inputs.build_KDE || 'min' }}" \
-            -L "${{ inputs.build_KDE_plus || 'false' }}" \
-            -P "${{ inputs.PulseAudio || 'socket' }}" \
-            -g "${{ inputs.enable_zh_tz || 'en' }}" \
-            -a "${{ inputs.enable_binfmt || 'false' }}" \
-            -b "${{ inputs.enable_yj || 'true' }}" \
-            -c "${{ inputs.enable_mesa || 'true' }}" \
-            -d "${{ inputs.enable_kfgj || 'false' }}" \
-            -e "${{ inputs.enable_zip || 'true' }}" \
-            -f "${{ inputs.enable_docker || 'false' }}" \
-            -h "${{ inputs.enable_srf || 'false' }}" \
-            -j "${{ inputs.enable_tmoe || 'true' }}" \
-            -A "${{ inputs.enable_anland_kde || 'false' }}" \
-            -u "${{ inputs.custom_username || 'Gold' }}"
+            -K "${{ inputs.build_KDE }}" \
+            -L "${{ inputs.build_KDE_plus }}" \
+            -P "${{ inputs.PulseAudio }}" \
+            -g "${{ inputs.enable_zh_tz }}" \
+            -a "${{ inputs.enable_binfmt }}" \
+            -b "${{ inputs.enable_yj }}" \
+            -c "${{ inputs.enable_mesa }}" \
+            -d "${{ inputs.enable_kfgj }}" \
+            -e "${{ inputs.enable_zip }}" \
+            -f "${{ inputs.enable_docker }}" \
+            -h "${{ inputs.enable_srf }}" \
+            -j "${{ inputs.enable_tmoe }}" \
+            -A "${{ inputs.enable_anland_kde }}" \
+            -u "${{ inputs.custom_username }}"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -213,9 +210,9 @@ jobs:
         run: |
           mkdir -p release_assets
           mv *.tar.xz release_assets/
-          PA_CHOICE="${{ github.event.inputs.PulseAudio || 'socket' }}"
-          CUSTOM_USERNAME="${{ github.event.inputs.custom_username || 'Gold' }}"
-          build_KDE_plus="${{ github.event.inputs.build_KDE_plus || 'false' }}"
+          PA_CHOICE="${{ github.event.inputs.PulseAudio }}"
+          CUSTOM_USERNAME="${{ github.event.inputs.custom_username }}"
+          build_KDE_plus="${{ github.event.inputs.build_KDE_plus }}"
           if [ "$PA_CHOICE" != "none" ] && [ "$build_KDE_plus" = "false" ]; then
             cp "scripts/on_aaudio_${PA_CHOICE}.sh" "release_assets/on_aaudio_${PA_CHOICE}.sh"
             sed -i "s/USERNAME=\"Gold\"/USERNAME=\"${CUSTOM_USERNAME}\"/g" "release_assets/on_aaudio_${PA_CHOICE}.sh"
@@ -230,23 +227,23 @@ jobs:
           body: |
             Droidspaces RootFS Automated Build
             Build Time: ${{ needs.setup.outputs.build_date }}
-            Build Target (User Specified): ${{ github.event.inputs.build_target || 'Debian-13-KDE' }}
+            Build Target (User Specified): ${{ github.event.inputs.build_target }}
             Build ID: ${{ needs.setup.outputs.build_id }}
 
             Build Options:
-            - **Custom Username**: ${{ github.event.inputs.custom_username || 'Gold' }}
-            - **KDE Desktop**: ${{ github.event.inputs.build_KDE || 'min' }}
-            - **KDE Auto-start**: ${{ github.event.inputs.build_KDE_plus || 'false' }}
-            - **Wayland support**: ${{ github.event.inputs.enable_anland_kde || 'false' }}
-            - PulseAudio Audio Forwarding: ${{ github.event.inputs.PulseAudio || 'socket' }}
-            - System Primary Language/Timezone: ${{ github.event.inputs.enable_zh_tz || 'en' }}
-            - Qualcomm Snapdragon GPU Support: ${{ github.event.inputs.enable_mesa || 'true' }}
-            - Integrate TMOE: ${{ github.event.inputs.enable_tmoe || 'true' }}
-            - Input Method fcitx5 Support: ${{ github.event.inputs.enable_srf || 'false' }}
-            - Cross-architecture Support: ${{ github.event.inputs.enable_binfmt || 'false' }}
-            - Container Hardware and Network Recognition Support: ${{ github.event.inputs.enable_yj || 'true' }}
-            - Development Tools Integration: ${{ github.event.inputs.enable_kfgj || 'false' }}
-            - Compression Tools Integration: ${{ github.event.inputs.enable_zip || 'true' }}
+            - **Custom Username**: ${{ github.event.inputs.custom_username }}
+            - **KDE Desktop**: ${{ github.event.inputs.build_KDE }}
+            - **KDE Auto-start**: ${{ github.event.inputs.build_KDE_plus }}
+            - **Wayland support**: ${{ github.event.inputs.enable_anland_kde }}
+            - PulseAudio Audio Forwarding: ${{ github.event.inputs.PulseAudio }}
+            - System Primary Language/Timezone: ${{ github.event.inputs.enable_zh_tz }}
+            - Qualcomm Snapdragon GPU Support: ${{ github.event.inputs.enable_mesa }}
+            - Integrate TMOE: ${{ github.event.inputs.enable_tmoe }}
+            - Input Method fcitx5 Support: ${{ github.event.inputs.enable_srf }}
+            - Cross-architecture Support: ${{ github.event.inputs.enable_binfmt }}
+            - Container Hardware and Network Recognition Support: ${{ github.event.inputs.enable_yj }}
+            - Development Tools Integration: ${{ github.event.inputs.enable_kfgj }}
+            - Compression Tools Integration: ${{ github.event.inputs.enable_zip }}
             - Docker Integration: ${{ github.event.inputs.enable_docker }}
             
           draft: false
