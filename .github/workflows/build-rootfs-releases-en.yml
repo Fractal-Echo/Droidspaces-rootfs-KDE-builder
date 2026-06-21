@@ -1,10 +1,10 @@
 name: Build and Release Droidspaces RootFS
 
 on:
-  workflow_dispatch:
   push:
     branches:
-      - main 
+      - main
+  workflow_dispatch:
     inputs:
       build_target:
         description: 'Select the distribution to build'
