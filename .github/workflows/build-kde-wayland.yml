@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
 
     env:
-      ANLAND_REPO: https://github.com/superturtlee/anland.git
+      ANLAND_REPO: https://github.com/Coding-BR/anland.git
       ANLAND_REF: ${{ github.event.inputs.anland_ref }}
       BUILD_TARGET: ${{ github.event.inputs.build_target }}
 

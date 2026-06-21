@@ -87,7 +87,7 @@ RUN apt-get update && \
         dpkg -i /tmp/anland-debbuild/ubuntu2604/xwayland/*.deb || apt-get install -f -y && \
         echo "--> [开启] 正在安装 anland 启动脚本..." && \
         mkdir -p /opt/anland && \
-        git clone --depth=1 https://github.com/superturtlee/anland.git /tmp/anland && \
+        git clone --depth=1 https://github.com/Coding-BR/anland.git /tmp/anland && \
         cp /tmp/anland/producers/kde/ubuntu2604_v2/startup.sh /opt/anland/ && \
         cp /opt/anland/startup.sh /usr/local/bin/startanland-kde.sh && \
         chmod +x /usr/local/bin/startanland-kde.sh && \
