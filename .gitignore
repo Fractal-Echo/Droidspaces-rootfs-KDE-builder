@@ -1,0 +1,6 @@
+/*.tar
+/*.tar.*
+/*.img
+/*.qcow2
+/build/
+/out/
